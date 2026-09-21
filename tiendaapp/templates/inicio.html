@@ -1,4 +1,3 @@
-<!-- Barra de Navegación -->
 {% load static %}
 
 <head>
@@ -13,7 +12,6 @@
     <!-- Tu archivo CSS personalizado -->
     <link rel="stylesheet" href="{% static 'tiendaapp/estilos.css' %}">
 </head>
-
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm">
     <div class="container">
         <a class="navbar-brand fw-bold text-info" href="#">
@@ -28,7 +26,7 @@
                     <a class="nav-link active" href="#"><i class="bi bi-house-door me-1"></i>Inicio</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#"><i class="bi bi-box-seam me-1"></i>Inventario</a>
+                    <a class="nav-link" href="#productos"><i class="bi bi-box-seam me-1"></i>Inventario</a>
                 </li>
             </ul>
             <div class="d-flex align-items-center gap-2">
@@ -113,7 +111,7 @@
     </div>
 
     <!-- Tabla CRUD (Vista Escritorio / Tablet) -->
-    <div class="card shadow-sm border-0">
+    <div class="card shadow-sm border-0" id="productos">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-dark">
@@ -150,40 +148,20 @@
                             </span>
                         </td>
                         <td class="text-center">
-                            <button class="btn btn-sm btn-outline-primary me-1" title="Editar" data-bs-toggle="modal" data-bs-target="#modalEditarProducto">
+                            <a class="btn btn-sm btn-outline-primary me-1" title="Editar" href="{% url 'editar_producto' item.id %}">
                                 <i class="bi bi-pencil-square"></i>
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger" title="Eliminar" data-bs-toggle="modal" data-bs-target="#modalEliminarProducto">
-                                <i class="bi bi-trash"></i>
-                            </button>
+                            </a>
+                            <form action="{% url 'eliminar_producto' item.id %}" method="POST" class="d-inline">
+                                {% csrf_token %}
+                                <button class="btn btn-sm btn-outline-danger" title="Eliminar" type="submit" onclick="return confirm('¿Eliminar este producto?');">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
                         </td>
                     </tr>
                     {% empty %}
-                    <!-- Fila de ejemplo mientras integras tus datos en Django -->
                     <tr>
-                        <th scope="row">#1</th>
-                        <td>
-                            <div class="d-flex align-items-center">
-                                <div class="bg-secondary bg-opacity-10 p-2 rounded me-2">
-                                    <i class="bi bi-gpu-card fs-4 text-primary"></i>
-                                </div>
-                                <div>
-                                    <span class="fw-semibold d-block">GeForce RTX 4070 12GB</span>
-                                    <small class="text-muted">Tarjeta gráfica para gaming y renderizado</small>
-                                </div>
-                            </div>
-                        </td>
-                        <td><span class="badge bg-info text-dark">Componentes</span></td>
-                        <td class="text-end fw-bold text-success">$599.99</td>
-                        <td class="text-center"><span class="badge bg-success">14 uds.</span></td>
-                        <td class="text-center">
-                            <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#modalEditarProducto">
-                                <i class="bi bi-pencil-square"></i>
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#modalEliminarProducto">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </td>
+                        <td colspan="6" class="text-center text-muted py-4">Aún no hay productos registrados.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -196,7 +174,7 @@
 <div class="modal fade" id="modalCrearProducto" tabindex="-1" aria-labelledby="modalCrearLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <form action="#" method="POST">
+            <form action="{% url 'crear_producto' %}" method="POST">
                 {% csrf_token %}
                 <div class="modal-header bg-primary text-white">
                     <h5 class="modal-title" id="modalCrearLabel"><i class="bi bi-plus-lg me-1"></i> Registrar Producto</h5>
@@ -205,7 +183,7 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Nombre del Artículo</label>
-                        <input type="text" class="form-control" name="nombre" placeholder="Ej: Teclado Mecánico RGB" required>
+                        {{ formulario.nombre }}
                     </div>
                     <div class="row g-2 mb-3">
                         <div class="col-md-6">
@@ -221,16 +199,16 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Precio ($)</label>
-                            <input type="number" step="0.01" class="form-control" name="precio" placeholder="0.00" required>
+                            {{ formulario.precio }}
                         </div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Stock Inicial</label>
-                        <input type="number" class="form-control" name="stock" placeholder="Cantidad disponible" required>
+                        {{ formulario.stock }}
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Descripción Técnica</label>
-                        <textarea class="form-control" name="descripcion" rows="3" placeholder="Especificaciones principales..."></textarea>
+                        {{ formulario.descripcion }}
                     </div>
                 </div>
                 <div class="modal-footer">

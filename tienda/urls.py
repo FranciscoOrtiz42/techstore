@@ -22,3 +22,4 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('tiendaapp.urls')),  # <-- Conecta las rutas de tu app aquí
 ]
+
