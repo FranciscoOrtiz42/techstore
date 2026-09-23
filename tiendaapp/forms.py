@@ -5,6 +5,7 @@ from .models import Producto
 
 # Formulario usado tanto para crear como para editar productos.
 class ProductoForm(forms.ModelForm):
+    # ModelForm convierte los datos enviados por HTML y valida antes de ejecutar save().
     # Estos límites se validan en el servidor y también se reflejan en el navegador.
     nombre = forms.CharField(
         label='Nombre',
@@ -18,8 +19,16 @@ class ProductoForm(forms.ModelForm):
     )
     precio = forms.IntegerField(
         label='Precio (CLP)',
-        min_value=0,
-        widget=forms.NumberInput(attrs={'step': '1', 'min': '0', 'inputmode': 'numeric'}),
+        min_value=1000,
+        max_value=9999999999,
+        widget=forms.NumberInput(
+            attrs={
+                'step': '1',
+                'min': '1000',
+                'max': '9999999999',
+                'inputmode': 'numeric',
+            }
+        ),
     )
     stock = forms.IntegerField(
         label='Stock',
@@ -38,6 +47,7 @@ class ProductoForm(forms.ModelForm):
 
     class Meta:
         model = Producto
+        # Estos campos son los datos que el usuario puede crear o modificar desde la web.
         # Se muestran en este orden para que coincida con el formulario de la aplicación.
         fields = ['nombre', 'categoria', 'precio', 'stock', 'descripcion']
         widgets = {

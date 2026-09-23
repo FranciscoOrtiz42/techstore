@@ -34,8 +34,10 @@ def _coincide_producto(producto, consulta):
 
 def inicio(request):
       # Carga los datos necesarios para el panel principal y sus tarjetas de resumen.
+      # SELECT equivalente: trae todos los registros para mostrarlos en la página principal.
       todos_productos = Producto.objects.all()
       busqueda = request.GET.get('q', '').strip()
+      # aggregate(Sum) calcula el total en la base de datos; filter/count obtiene los productos bajo stock.
       stock_disponible = todos_productos.aggregate(total=Sum('stock'))['total'] or 0
       stock_bajo = todos_productos.filter(stock__lte=5).count()
       productos = todos_productos
@@ -53,6 +55,7 @@ def inicio(request):
 
 def lista_productos(request):
       # Vista sencilla del inventario completo.
+      # SELECT para la pantalla de consulta independiente del panel principal.
       productos = Producto.objects.all()
       return render(request, 'productos.html', {'productos': productos})
 
@@ -64,7 +67,7 @@ def crear_producto(request):
 
       formulario = ProductoForm(request.POST)
       if formulario.is_valid():
-            # ProductoForm centraliza las validaciones antes de guardar en la base de datos.
+            # C: save() ejecuta el INSERT solo después de validar los datos recibidos.
             formulario.save()
             messages.success(request, 'Producto creado correctamente.')
       else:
@@ -74,6 +77,7 @@ def crear_producto(request):
 
 def editar_producto(request, producto_id):
       # Si el producto no existe, Django devuelve automáticamente una respuesta 404.
+      # SELECT ... WHERE id = producto_id; get_object_or_404 evita editar una fila inexistente.
       producto = get_object_or_404(Producto, pk=producto_id)
       if request.method == 'GET':
             # En GET se muestran los datos actuales para poder modificarlos.
@@ -84,7 +88,7 @@ def editar_producto(request, producto_id):
 
       formulario = ProductoForm(request.POST, instance=producto)
       if formulario.is_valid():
-            # Pasar instance conserva el registro y actualiza sus datos en lugar de crear otro.
+            # U: instance indica qué fila actualizar; save() ejecuta el UPDATE, no un INSERT.
             formulario.save()
             messages.success(request, 'Producto actualizado correctamente.')
       else:
@@ -95,6 +99,7 @@ def editar_producto(request, producto_id):
 def eliminar_producto(request, producto_id):
       # La eliminación se limita a POST para evitar borrados accidentales mediante un enlace.
       if request.method == 'POST':
+            # D: obtiene la fila por su ID y delete() ejecuta el DELETE en la base de datos.
             producto = get_object_or_404(Producto, pk=producto_id)
             producto.delete()
             messages.success(request, 'Producto eliminado correctamente.')

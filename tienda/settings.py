@@ -77,7 +77,9 @@ WSGI_APPLICATION = 'tienda.wsgi.application'
 
 DATABASES = {
     'default': {
+        # Requisito de persistencia: Django trabaja con MySQL/MariaDB mediante mysqlclient.
         'ENGINE': 'django.db.backends.mysql',
+        # Estos valores permiten configurar la conexión sin guardar credenciales en el código.
         'NAME': os.getenv('MYSQL_DATABASE', 'techstore'),
         'USER': os.getenv('MYSQL_USER', 'root'),
         'PASSWORD': os.getenv('MYSQL_PASSWORD', ''),
@@ -85,6 +87,7 @@ DATABASES = {
         'PORT': os.getenv('MYSQL_PORT', '3306'),
         'OPTIONS': {
             'charset': 'utf8mb4',
+            # El modo estricto evita guardar datos inválidos silenciosamente.
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
         },
     }
