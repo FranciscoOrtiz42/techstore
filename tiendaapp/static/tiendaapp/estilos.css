@@ -1,7 +1,7 @@
 /* Variables y paleta de colores tech */
 :root {
   --primary-accent: #e50914;
-  --primary-accent-hover: #b80710;
+  --primary-accent-hover: #6a0f14;
   --bg-dark: #f5f7fa;
   --card-bg: #ffffff;
   --card-border: #d9e1ea;
@@ -19,7 +19,7 @@ html, body {
 /* Barra de navegación */
 .navbar {
   border-bottom: 1px solid var(--card-border);
-  background-color: #1f2937 !important;
+  background-color: #157798 !important;
   backdrop-filter: blur(8px);
 }
 
