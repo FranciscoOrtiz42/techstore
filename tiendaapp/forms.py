@@ -3,7 +3,9 @@ from django import forms
 from .models import Producto
 
 
+# Formulario usado tanto para crear como para editar productos.
 class ProductoForm(forms.ModelForm):
+    # Estos límites se validan en el servidor y también se reflejan en el navegador.
     nombre = forms.CharField(
         label='Nombre',
         max_length=30,
@@ -36,6 +38,7 @@ class ProductoForm(forms.ModelForm):
 
     class Meta:
         model = Producto
+        # Se muestran en este orden para que coincida con el formulario de la aplicación.
         fields = ['nombre', 'categoria', 'precio', 'stock', 'descripcion']
         widgets = {
             'categoria': forms.TextInput(attrs={'placeholder': 'Ej: Periféricos'}),
