@@ -1,12 +1,20 @@
 from django.test import TestCase
 from django.urls import reverse
 from django.core.exceptions import ValidationError
+from django.contrib.auth import get_user_model
 
 from .forms import ProductoForm
 from .models import Producto
 
 
 class ProductoCrudTests(TestCase):
+	def setUp(self):
+		usuario = get_user_model().objects.create_superuser(
+			username='usuario_prueba',
+			password='clave-prueba-123',
+		)
+		self.client.force_login(usuario)
+
 	def test_validaciones_de_precio_clp(self):
 		base_data = {
 			'nombre': 'Teclado mecánico',
@@ -72,3 +80,36 @@ class ProductoCrudTests(TestCase):
 		self.assertEqual(response.status_code, 302)
 		self.assertEqual(response.url, reverse('inicio'))
 		self.assertFalse(Producto.objects.filter(id=producto.id).exists())
+
+
+class LoginTests(TestCase):
+	def setUp(self):
+		self.usuario = get_user_model().objects.create_superuser(
+			username='usuario_prueba',
+			password='clave-prueba-123',
+		)
+
+	def test_login_valido(self):
+		response = self.client.post(reverse('login'), {
+			'username': 'usuario_prueba',
+			'password': 'clave-prueba-123',
+		})
+
+		self.assertRedirects(response, reverse('inicio'))
+
+	def test_login_rechaza_credenciales_incorrectas(self):
+		response = self.client.post(reverse('login'), {
+			'username': 'usuario_prueba',
+			'password': 'incorrecta',
+		})
+
+		self.assertEqual(response.status_code, 200)
+		self.assertFalse(response.wsgi_request.user.is_authenticated)
+
+	def test_inicio_requiere_login(self):
+		response = self.client.get(reverse('inicio'))
+
+		self.assertRedirects(
+			response,
+			f"{reverse('login')}?next={reverse('inicio')}",
+		)

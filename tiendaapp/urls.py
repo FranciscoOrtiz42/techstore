@@ -1,8 +1,11 @@
 from django.urls import path
+from django.contrib.auth import views as auth_views
 from . import views
 
 # Rutas públicas de la aplicación y acciones principales del inventario.
 urlpatterns = [
+    path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     # C: muestra el panel y el formulario de alta.
     path('', views.inicio, name='inicio'),  # Panel principal con resumen e inventario.
     # R: consulta todos los productos guardados.
