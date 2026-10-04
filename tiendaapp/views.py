@@ -1,6 +1,7 @@
 import unicodedata
 from difflib import SequenceMatcher
 
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Sum
 from django.shortcuts import get_object_or_404, redirect, render
@@ -32,6 +33,7 @@ def _coincide_producto(producto, consulta):
       return False
 
 
+@login_required
 def inicio(request):
       # Carga los datos necesarios para el panel principal y sus tarjetas de resumen.
       # SELECT equivalente: trae todos los registros para mostrarlos en la página principal.
@@ -53,6 +55,7 @@ def inicio(request):
       })
 
 
+@login_required
 def lista_productos(request):
       # Vista sencilla del inventario completo.
       # SELECT para la pantalla de consulta independiente del panel principal.
@@ -60,6 +63,7 @@ def lista_productos(request):
       return render(request, 'productos.html', {'productos': productos})
 
 
+@login_required
 def crear_producto(request):
       # El alta solo acepta envíos POST desde el formulario de la página principal.
       if request.method != 'POST':
@@ -75,6 +79,7 @@ def crear_producto(request):
       return redirect('inicio')
 
 
+@login_required
 def editar_producto(request, producto_id):
       # Si el producto no existe, Django devuelve automáticamente una respuesta 404.
       # SELECT ... WHERE id = producto_id; get_object_or_404 evita editar una fila inexistente.
@@ -96,6 +101,7 @@ def editar_producto(request, producto_id):
       return redirect('inicio')
 
 
+@login_required
 def eliminar_producto(request, producto_id):
       # La eliminación se limita a POST para evitar borrados accidentales mediante un enlace.
       if request.method == 'POST':
