@@ -43,6 +43,12 @@ class ProductoCrudTests(TestCase):
 		with self.assertRaises(ValidationError):
 			producto.full_clean()
 
+	def test_formulario_producto_usa_controles_estilizados(self):
+		formulario = ProductoForm()
+
+		for campo in ('nombre', 'precio', 'stock', 'descripcion'):
+			self.assertIn('form-control', formulario.fields[campo].widget.attrs['class'])
+
 	def test_crear_producto(self):
 		response = self.client.post(reverse('crear_producto'), {
 			'nombre': 'Teclado mecánico',
@@ -96,6 +102,17 @@ class LoginTests(TestCase):
 		})
 
 		self.assertRedirects(response, reverse('inicio'))
+		response = self.client.get(reverse('inicio'))
+		self.assertContains(response, 'Cerrar sesión')
+
+	def test_login_muestra_acceso_para_usuario_anonimo(self):
+		response = self.client.get(reverse('login'))
+
+		self.assertContains(response, 'Iniciar sesión')
+		self.assertContains(response, 'name="username"')
+		self.assertContains(response, 'name="password"')
+		self.assertContains(response, 'required')
+
 
 	def test_login_rechaza_credenciales_incorrectas(self):
 		response = self.client.post(reverse('login'), {
@@ -105,6 +122,7 @@ class LoginTests(TestCase):
 
 		self.assertEqual(response.status_code, 200)
 		self.assertFalse(response.wsgi_request.user.is_authenticated)
+		self.assertTrue(response.context['form'].non_field_errors())
 
 	def test_inicio_requiere_login(self):
 		response = self.client.get(reverse('inicio'))

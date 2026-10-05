@@ -53,3 +53,10 @@ class ProductoForm(forms.ModelForm):
         widgets = {
             'categoria': forms.TextInput(attrs={'placeholder': 'Ej: Periféricos'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for campo in self.fields.values():
+            clase_control = 'form-select' if isinstance(campo.widget, forms.Select) else 'form-control'
+            clases_existentes = campo.widget.attrs.get('class', '')
+            campo.widget.attrs['class'] = f'{clases_existentes} {clase_control}'.strip()

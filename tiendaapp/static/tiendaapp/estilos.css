@@ -16,6 +16,83 @@ html, body {
   min-height: 100vh;
 }
 
+.login-page {
+  background:
+    radial-gradient(circle at 12% 18%, rgba(21, 119, 152, 0.12), transparent 26rem),
+    var(--bg-dark);
+}
+
+.login-shell {
+  min-height: calc(100vh - 56px);
+  min-height: calc(100dvh - 56px);
+  display: grid;
+  place-items: center;
+  padding: clamp(1.25rem, 4vw, 3rem) 1rem;
+}
+
+.login-panel {
+  width: min(100%, 430px);
+  margin-inline: auto;
+  padding: 2.25rem;
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-top: 4px solid var(--primary-accent);
+  border-radius: 12px;
+  box-shadow: 0 18px 48px rgba(31, 41, 55, 0.1);
+}
+
+.login-brand {
+  display: inline-block;
+  margin-bottom: 1.75rem;
+  color: #157798;
+  font-size: 0.9rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.login-brand span {
+  color: var(--primary-accent);
+}
+
+.login-panel h1 {
+  margin-bottom: 0.4rem;
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+.login-intro {
+  margin-bottom: 1.75rem;
+  color: var(--text-muted);
+}
+
+.login-panel .form-control {
+  min-height: 46px;
+}
+
+.navbar .session-link {
+  white-space: nowrap;
+}
+
+@media (max-width: 991.98px) {
+  .navbar-actions {
+    align-items: stretch !important;
+    gap: 0.5rem !important;
+    margin-top: 0.75rem;
+  }
+
+  .navbar-actions form,
+  .navbar-actions button,
+  .navbar-actions > a {
+    width: 100%;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .login-panel {
+    padding: 1.75rem 1.25rem;
+  }
+}
+
 /* Barra de navegación */
 .navbar {
   border-bottom: 1px solid var(--card-border);
@@ -120,6 +197,39 @@ html, body {
 
 .modal-header, .modal-footer {
   border-color: var(--card-border);
+}
+
+.modal-product-header {
+  background-color: var(--primary-accent);
+  color: #ffffff;
+}
+
+.modal-product-header .modal-title {
+  font-weight: 700;
+}
+
+.modal-product-header .btn-close {
+  filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+.product-modal-content .modal-body {
+  padding: 1.5rem;
+}
+
+#modalCrearProducto .form-label {
+  display: block;
+  margin-bottom: 0.45rem;
+}
+
+#modalCrearProducto .form-control,
+#modalCrearProducto .form-select {
+  width: 100%;
+  min-height: 46px;
+}
+
+#modalCrearProducto textarea.form-control {
+  min-height: 120px;
+  resize: vertical;
 }
 
 .btn-close {
