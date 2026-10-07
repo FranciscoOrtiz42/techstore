@@ -28,13 +28,15 @@
                     <input class="form-control{% if form.username.errors %} is-invalid{% endif %}"
                            type="text" name="{{ form.username.html_name }}"
                            id="{{ form.username.id_for_label }}" value="{{ form.username.value|default:'' }}"
+                           maxlength="{{ form.username.field.max_length }}"
                            autocomplete="username" required autofocus>
                     {% for error in form.username.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
                 </div>
                 <div class="mb-4">
                     <label class="form-label" for="{{ form.password.id_for_label }}">Contraseña</label>
                     <input class="form-control{% if form.password.errors %} is-invalid{% endif %}"
-                           type="password" name="{{ form.password.html_name }}"
+                              type="password" name="{{ form.password.html_name }}"
+                              maxlength="{{ form.password.field.max_length }}"
                            id="{{ form.password.id_for_label }}" autocomplete="current-password" required>
                     {% for error in form.password.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
                 </div>

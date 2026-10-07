@@ -1,3 +1,5 @@
+import json
+
 from django.test import TestCase
 from django.urls import reverse
 from django.core.exceptions import ValidationError
@@ -86,6 +88,72 @@ class ProductoCrudTests(TestCase):
 		self.assertEqual(response.status_code, 302)
 		self.assertEqual(response.url, reverse('inicio'))
 		self.assertFalse(Producto.objects.filter(id=producto.id).exists())
+
+
+class ProductoApiTests(TestCase):
+	def setUp(self):
+		usuario = get_user_model().objects.create_superuser(
+			username='usuario_api',
+			password='clave-prueba-123',
+		)
+		self.client.force_login(usuario)
+
+	def test_get_api_lista_productos(self):
+		Producto.objects.create(
+			nombre='Monitor',
+			categoria='Monitores',
+			precio='19990',
+			stock=3,
+		)
+
+		response = self.client.get(reverse('api_productos'))
+
+		self.assertEqual(response.status_code, 200)
+		self.assertEqual(response.json()['productos'][0]['nombre'], 'Monitor')
+		self.assertEqual(response.json()['productos'][0]['precio'], '19990')
+
+	def test_post_api_crea_producto(self):
+		datos = {
+			'nombre': 'Teclado mecánico',
+			'categoria': 'Periféricos',
+			'precio': 24990,
+			'stock': 8,
+			'descripcion': 'Teclado RGB',
+		}
+
+		response = self.client.post(
+			reverse('api_productos'),
+			data=json.dumps(datos),
+			content_type='application/json',
+		)
+
+		self.assertEqual(response.status_code, 201)
+		self.assertTrue(Producto.objects.filter(nombre='Teclado mecánico').exists())
+		self.assertEqual(response.json()['producto']['stock'], 8)
+
+	def test_post_api_rechaza_producto_invalido_en_espanol(self):
+		datos = {'nombre': '', 'categoria': 'Periféricos', 'precio': 500, 'stock': -1}
+
+		response = self.client.post(
+			reverse('api_productos'),
+			data=json.dumps(datos),
+			content_type='application/json',
+		)
+
+		self.assertEqual(response.status_code, 400)
+		self.assertEqual(
+			response.json()['mensaje'],
+			'No se pudo crear el producto. Revisa los datos.',
+		)
+		self.assertIn('nombre', response.json()['errores'])
+
+	def test_api_requiere_autenticacion(self):
+		self.client.logout()
+
+		response = self.client.get(reverse('api_productos'))
+
+		self.assertEqual(response.status_code, 401)
+		self.assertEqual(response.json()['error'], 'Debes iniciar sesión para acceder a esta API.')
 
 
 class LoginTests(TestCase):
