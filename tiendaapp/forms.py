@@ -1,6 +1,34 @@
 from django import forms
+from django.contrib.auth.forms import AuthenticationForm, UsernameField
+from django.utils.translation import gettext_lazy as _
 
 from .models import Producto
+
+
+class LoginForm(AuthenticationForm):
+    username = UsernameField(
+        max_length=10,
+        widget=forms.TextInput(attrs={'autofocus': True, 'maxlength': 10}),
+        error_messages={
+            'required': _('Ingresa tu usuario.'),
+            'max_length': _('El usuario no puede superar los 10 caracteres.'),
+        },
+    )
+    password = forms.CharField(
+        max_length=15,
+        widget=forms.PasswordInput(attrs={'autocomplete': 'current-password', 'maxlength': 15}),
+        error_messages={
+            'required': _('Ingresa tu contraseña.'),
+            'max_length': _('La contraseña no puede superar los 15 caracteres.'),
+        },
+    )
+    error_messages = {
+        **AuthenticationForm.error_messages,
+        'invalid_login': _(
+            'Usuario o contraseña incorrectos. Ambos campos distinguen mayúsculas y minúsculas.'
+        ),
+        'inactive': _('Esta cuenta está inactiva.'),
+    }
 
 
 # Formulario usado tanto para crear como para editar productos.

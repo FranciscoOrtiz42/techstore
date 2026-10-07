@@ -1,9 +1,11 @@
+import json
 import unicodedata
 from difflib import SequenceMatcher
 
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Sum
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import ProductoForm
@@ -31,6 +33,60 @@ def _coincide_producto(producto, consulta):
             if any(SequenceMatcher(None, consulta, palabra).ratio() >= 0.75 for palabra in palabras):
                   return True
       return False
+
+
+def _producto_a_dict(producto):
+      return {
+            'id': producto.pk,
+            'nombre': producto.nombre,
+            'categoria': producto.categoria,
+            'descripcion': producto.descripcion,
+            'precio': str(producto.precio),
+            'stock': producto.stock,
+            'creado_en': producto.creado_en.isoformat(),
+            'actualizado_en': producto.actualizado_en.isoformat(),
+      }
+
+
+def api_productos(request):
+      if not request.user.is_authenticated:
+            return JsonResponse({'error': 'Debes iniciar sesión para acceder a esta API.'}, status=401)
+
+      if request.method == 'GET':
+            productos = Producto.objects.all()
+            return JsonResponse({'productos': [_producto_a_dict(producto) for producto in productos]})
+
+      if request.method == 'POST':
+            if request.content_type != 'application/json':
+                  return JsonResponse(
+                        {'error': 'El contenido de la solicitud debe ser JSON.'},
+                        status=415,
+                  )
+
+            try:
+                  datos = json.loads(request.body)
+            except (json.JSONDecodeError, UnicodeDecodeError):
+                  return JsonResponse({'error': 'El cuerpo de la solicitud no contiene JSON válido.'}, status=400)
+
+            if not isinstance(datos, dict):
+                  return JsonResponse({'error': 'Los datos deben enviarse como un objeto JSON.'}, status=400)
+
+            formulario = ProductoForm(data=datos)
+            if not formulario.is_valid():
+                  return JsonResponse({
+                        'mensaje': 'No se pudo crear el producto. Revisa los datos.',
+                        'errores': formulario.errors.get_json_data(),
+                  }, status=400)
+
+            producto = formulario.save()
+            return JsonResponse({
+                  'mensaje': 'Producto creado correctamente.',
+                  'producto': _producto_a_dict(producto),
+            }, status=201)
+
+      respuesta = JsonResponse({'error': 'Método no permitido. Usa GET o POST.'}, status=405)
+      respuesta['Allow'] = 'GET, POST'
+      return respuesta
 
 
 @login_required
